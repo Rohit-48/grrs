@@ -1,7 +1,12 @@
+extern crate serde;
+extern crate time;
+extern crate anyhow;
+
+mod config;
+
 use anyhow::{Context, Ok, Result};
 use clap::Parser;
 use serde::{Deserialize, Serialize};
-use signal_hook::{consts::SIGINT, iterator::Signals};
 use std::{error::Error, thread, time::Duration};
 use crossbeam_channel::{bounded, tick, Receiver, select};
 
@@ -14,14 +19,9 @@ struct Cli {
     path: std::path::PathBuf,
 }
 // configuration struct
-#[derive(Debug, Serialize, Deserialize)]
-struct MyConfig{
-    name: String,
-    comfy: bool,
-    foo: i64,
-}
 
-// signal ctrl + c
+
+// signal ctrl + ctrlc using ctrlc Crate
 fn ctrl_channel() -> Result<Receiver<()>, ctrlc::Error>{
     let (sender, receiver) = bounded(100);
     ctrlc::set_handler(move || {
@@ -53,24 +53,3 @@ fn find_a_match() {
     assert_eq!(result, b"lorem ipsum\n");
 }
 
-// commented fn of ctrl + c
-
-// fn main() -> Result<()> {
-//     let ctrl_c_events = ctrl_channel()?;
-//     let ticks = tick(Duration::from_secs(1));
-//
-//     loop {
-//         select! {
-//             recv(ticks) -> _ => {
-//                 println!("working!");
-//             }
-//             recv(ctrl_c_events) -> _ => {
-//                 println!();
-//                 println!("Goodbye!");
-//                 break;
-//             }
-//         }
-//     }
-//
-//     Ok(())
-// }
