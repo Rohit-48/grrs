@@ -1,6 +1,7 @@
 [package]
 name = "grrs"
 version = "0.1.0"
+edition = "2021"
 authors = ["Rohit <rohitmandavkar3577@gmail.com>"]
 license = "MIT"
 description = "A tool to search files"

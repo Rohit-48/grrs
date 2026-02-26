@@ -1,14 +1,13 @@
-extern crate serde;
-extern crate time;
-extern crate anyhow;
-
 mod config;
+mod lib;
+use grrs::find_matches;
+
 
 use anyhow::{Context, Ok, Result};
 use clap::Parser;
+use crossbeam_channel::{bounded, select, tick, Receiver};
 use serde::{Deserialize, Serialize};
 use std::{error::Error, thread, time::Duration};
-use crossbeam_channel::{bounded, tick, Receiver, select};
 
 /// search for  a pattern  in a input file and display the line that contains it.
 #[derive(Parser)]
@@ -20,9 +19,8 @@ struct Cli {
 }
 // configuration struct
 
-
 // signal ctrl + ctrlc using ctrlc Crate
-fn ctrl_channel() -> Result<Receiver<()>, ctrlc::Error>{
+fn ctrl_channel() -> Result<Receiver<()>, ctrlc::Error> {
     let (sender, receiver) = bounded(100);
     ctrlc::set_handler(move || {
         let _ = sender.send(());
@@ -31,6 +29,9 @@ fn ctrl_channel() -> Result<Receiver<()>, ctrlc::Error>{
 }
 
 fn main() -> Result<()> {
+    // config
+    let cfg = config::load_config();
+    println!("Running with config file: {:?}", cfg); // temp pringting.
     let args = Cli::parse();
     let content = std::fs::read_to_string(&args.path)
         .with_context(|| format!("could not read file `{}` ", args.path.display()))?;
@@ -39,17 +40,17 @@ fn main() -> Result<()> {
 
     Ok(())
 }
-fn find_matches(content: &str, pattern: &str, mut writer:impl std::io::Write){
-    for line in content.lines(){
-        if line.contains(pattern){
+fn find_matches(content: &str, pattern: &str, mut writer: impl std::io::Write) {
+    for line in content.lines() {
+        if line.contains(pattern) {
             writeln!(writer, "{}", line);
         }
     }
 }
-#[test] ///  It allows the build system to discover such functions and run them as tests, verifying that they don’t panic.
+#[test]
+///  It allows the build system to discover such functions and run them as tests, verifying that they don’t panic.
 fn find_a_match() {
     let mut result = Vec::new();
     find_matches("lorem ipsum\ndolor sit amet", "lorem", &mut result);
     assert_eq!(result, b"lorem ipsum\n");
 }
-
