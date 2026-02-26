@@ -1,11 +1,9 @@
-extern crate ctrlc;
-extern crate anyhow;
-
-use ctrlc::set_handler;
-use std::time::Duration;
-use crossbeam_channel::{bounded, tick, Receiver, select};
 use anyhow::{Context, Ok, Result};
 use clap::Parser;
+use serde::{Deserialize, Serialize};
+use signal_hook::{consts::SIGINT, iterator::Signals};
+use std::{error::Error, thread, time::Duration};
+use crossbeam_channel::{bounded, tick, Receiver, select};
 
 /// search for  a pattern  in a input file and display the line that contains it.
 #[derive(Parser)]
@@ -15,6 +13,13 @@ struct Cli {
     // path to read file
     path: std::path::PathBuf,
 }
+// configuration struct
+#[derive(Debug, Serialize, Deserialize)]
+struct MyConfig{
+    name: String,
+    comfy: bool,
+    foo: i64,
+}
 
 // signal ctrl + c
 fn ctrl_channel() -> Result<Receiver<()>, ctrlc::Error>{
@@ -22,7 +27,7 @@ fn ctrl_channel() -> Result<Receiver<()>, ctrlc::Error>{
     ctrlc::set_handler(move || {
         let _ = sender.send(());
     })?;
-    Ok(receiver);
+    Ok(receiver)
 }
 
 fn main() -> Result<()> {
