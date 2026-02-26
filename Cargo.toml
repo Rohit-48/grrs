@@ -1,7 +1,15 @@
 [package]
 name = "grrs"
 version = "0.1.0"
-edition = "2024"
+authors = ["Rohit <rohitmandavkar3577@gmail.com>"]
+license = "MIT"
+description = "A tool to search files"
+readme = "README.md"
+homepage = "https://github.com/Rohit-48/grrs"
+repository = "https://github.com/Rohit-48/grrs"
+keywords = ["cli", "search", "demo"]
+categories = ["command-line-utilities"]
+
 
 [dependencies]
 clap = { version = "=4.5.49", features = ["derive"] }

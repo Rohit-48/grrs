@@ -5,4 +5,3 @@ pub fn find_matches(content: &str, pattern: &str, mut writer: impl std::io::Writ
     }
 
 }
-
